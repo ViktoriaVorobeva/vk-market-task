@@ -1,25 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import { Col, Row } from "antd";
+import Title from "antd/es/typography/Title";
+import { GoodsList } from "./components/GoodsList";
+import { useDispatch, useSelector } from "./services/hooks";
+import { getGoodsData } from "./services/actions";
+import { LoadingOutlined } from "@ant-design/icons";
+import { PriceTotal } from "./components/PriceTotal";
 
 function App() {
+  const { isLoading, isError } = useSelector((store) => store.goods);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getGoodsData());
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+    <>
+      <Title>Корзина</Title>
+      {isLoading && <LoadingOutlined />}
+      {isError && (
+        <p style={{ color: "red" }}>
+          Произошла ошибка! Обновите страницу/попробуйте отправить запрос позже
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      )}
+      {!isError && !isLoading && (
+        <Row gutter={40}>
+          <Col span={18}>
+            <Title level={2}>Выбранные товары</Title>
+            <GoodsList />
+          </Col>
+          <Col span={6}>
+            <PriceTotal />
+          </Col>
+        </Row>
+      )}
+    </>
   );
 }
 
